@@ -1,0 +1,38 @@
+groups:
+  - name: crypto_alerts
+    rules:
+      - alert: HighPriceVolatility
+        expr: abs(crypto_price_change_pct) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High price volatility detected for {{ $labels.symbol }}"
+          description: "Price change of {{ $value }}% detected for {{ $labels.symbol }}"
+
+      - alert: IngestDown
+        expr: up{job="crypto-ingest"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Crypto Ingest service is down"
+          description: "The crypto-ingest service has been down for more than 1 minute"
+
+      - alert: KafkaDown
+        expr: up{job="kafka"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka broker is down"
+          description: "Kafka broker has been down for more than 1 minute"
+
+      - alert: HighMessageRate
+        expr: rate(crypto_messages_sent_total[1m]) > 100
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "High message rate detected"
+          description: "Message rate is {{ $value }} messages/second"

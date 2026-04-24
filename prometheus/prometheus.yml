@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # Kafka monitoring requires JMX Exporter - disabled for now
+  # To enable: add jmx_exporter javaagent to Kafka container and expose port 9999
+
+  - job_name: 'crypto-ingest'
+    static_configs:
+      - targets: ['ingest:8000']
+    metrics_path: /metrics
+    scheme: http
+
+  # Spark monitoring disabled - JMX Exporter was causing crashes
+  # Enable when needed by adding jmx_exporter with proper config
